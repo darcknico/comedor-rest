@@ -27,6 +27,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'port' => '5432'
+        ],
+        // swagger php
+        'swagger' => [
+          'path' => __DIR__ . '/../app/',
         ]
         /*
         'db' => [

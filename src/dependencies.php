@@ -59,47 +59,28 @@ $container['AutenticacionControlador'] = function ($container) {
 	return new \App\Controladores\AutenticacionControlador($container);
 };
 
-$container['ProductoControlador'] = function ($container) {
-	return new \App\Controladores\Almacen\ProductoControlador($container);
-};
-$container['OfertaControlador'] = function ($container) {
-	return new \App\Controladores\Almacen\OfertaControlador($container);
-};
-$container['LocalControlador'] = function ($container) {
-	return new \App\Controladores\Almacen\LocalControlador($container);
-};
-
 $container['server'] = function ($container) {
-  $storage = new OAuth2\Storage\Memory(
-    [
-        'client_credentials' => [
-            'testClientId' => [
-                'client_id' => 'testclient',
-                'client_secret' => 'testpass'
-            ]
-        ]
-    ]
-  );
-  /*
   $storage = new OAuth2\Storage\Pdo(array(
-      'dsn' => 'mysql:dbname='.$container['settings']['db']['database'].
+      'dsn' => 'pgsql:dbname='.$container['settings']['db']['database'].
                ';host='.$container['settings']['db']['host'],
       'username' => $container['settings']['db']['username'],
       'password' => $container['settings']['db']['password'],
     )
   );
-  */
-  $server = new OAuth2\Server(
-    $storage,
-    [
-      'allow_implicit' => true,
-      'access_lifetime' => 8000,
-    ],
-    [
-      new OAuth2\GrantType\ClientCredentials($storage),
-      new OAuth2\GrantType\AuthorizationCode($storage)
-    ]
+  $server = new OAuth2\Server($storage);
+  $server->addGrantType(new OAuth2\GrantType\UserCredentials($storage));
+  $server->addGrantType(new OAuth2\GrantType\RefreshToken($storage));
+  $defaultScope = 'basico';
+  $supportedScopes = array(
+      'basico',
+      'medio',
+      'completo'
   );
+  $scope = new OAuth2\Scope(array(
+    'default_scope' => $defaultScope,
+    'supported_scopes' => $supportedScopes
+  ));
+  $server->setScopeUtil($scope);
 	return $server;
 };
 
@@ -107,8 +88,8 @@ $container['http'] = function ($container){
   return new \GuzzleHttp\Client([
     'headers' => [ 'Content-Type' => 'application/json' ],
     //'base_uri' => 'http://proyectosinformaticos.esy.es/apirest.slim/public/',
-    'base_uri' => 'http://localhost:8080/apirest.slim/public/',
-    'timeout'  => 5.0,
+    'base_uri' => 'http://localhost/proyectos/comedor-rest/public/',
+    'timeout'  => 10.0,
   ]);
 };
 

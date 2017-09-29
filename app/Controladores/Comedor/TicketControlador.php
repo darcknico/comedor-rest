@@ -6,12 +6,13 @@ use App\Modelos\Usuario;
 use App\Modelos\Comedor\Menu;
 use App\Modelos\Comedor\Ticket;
 use App\Controladores\Controlador;
+use Chadicus\Slim\OAuth2\Http\RequestBridge;
+use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 
-class TicketControlador extends Controlador
-{
-  public function getList($request,$response)
-  {
+class TicketControlador extends Controlador{
+
+  public function getList($request,$response){
     try{
       if($request->hasHeader('codigo')) {
         $todos = Ticket::with('menu')->with('usuario')->where('tic_codigo',$request->getHeader('codigo')[0])->first();
@@ -31,26 +32,20 @@ class TicketControlador extends Controlador
           ]
         );
       }
-      $us = Usuario::where('usu_token',$request->getHeader('token'))->first();
-      if($us){
-        $todos = Ticket::with('menu')->where('usu_id',$us->id)->get();
-        if($request->hasHeader('estado')){
-          $todos = Ticket::with('menu')->
-          where('usu_id',$us->id)->
-          where('tic_estado','like',$request->getHeader('estado'))->get();
-        }
-        return $response->withJson(
-          [
-            'resultado' => "Exito",
-            'salida' => $todos,
-            'numfilas' => $todos->count()
-          ]
-        );
+      $oauth2Request = RequestBridge::toOAuth2($request);
+      $token = $this->server->getAccessTokenData($oauth2Request);
+      $us = Usuario::where('usu_dni',$token['user_id'])->first();
+      $todos = Ticket::with('menu')->where('usu_id',$us->id)->get();
+      if($request->hasHeader('estado')){
+        $todos = Ticket::with('menu')->
+        where('usu_id',$us->id)->
+        where('tic_estado','like',$request->getHeader('estado')[0])->get();
       }
-      return $response->withStatus(403)->withJson(
+      return $response->withJson(
         [
-          'resultado' => "Usuario Invalido",
-          'numfilas' => 0
+          'resultado' => "Exito",
+          'salida' => $todos,
+          'numfilas' => $todos->count()
         ]
       );
     } catch (\Illuminate\Database\QueryException $e) {
@@ -81,7 +76,7 @@ class TicketControlador extends Controlador
           [
             'resultado' => "Exito",
             'salida' => $todos,
-            'numfilas' => $todos->count()
+            'numfilas' => 1
           ]
         );
       }
@@ -113,28 +108,22 @@ class TicketControlador extends Controlador
 	public function post($request,$response,$args)
 	{
 		try{
-      $us = Usuario::where('token',$request->getHeader('token'))->first();
+      $oauth2Request = RequestBridge::toOAuth2($request);
+      $token = $this->server->getAccessTokenData($oauth2Request);
+      $us = Usuario::where('usu_dni',$token['user_id'])->first();
       $input = $request->getParsedBody();
-      if($us){
-        $menu = Menu::where('men_id',$args['idMenu'])->first();
-  			$todos = Ticket::create([
-  				'men_id'=>$menu->id,
-          'usu_id'=> $us->id,
-          'tic_precio' => $menu->precio,
-          'tic_fecha' => $menu->fecha,
-  				]);
-        return $response->withJson(
-          [
-            'resultado' => "Creacion con Exito",
-            'salida' => $todos,
-            'numfilas' => 1
-          ]
-        );
-      }
-      return $response->withStatus(400)->withJson(
+      $menu = Menu::where('men_id',$args['idMenu'])->first();
+			$todos = Ticket::create([
+				'men_id'=>$menu->id,
+        'usu_id'=> $us->id,
+        'tic_precio' => $menu->precio,
+        'tic_fecha' => $menu->fecha,
+				]);
+      return $response->withJson(
         [
-          'resultado' => "Usuario Invalido",
-          'numfilas' => 0
+          'resultado' => "Creacion con Exito",
+          'salida' => $todos,
+          'numfilas' => 1
         ]
       );
 		} catch (\Illuminate\Database\QueryException $e) {
@@ -146,7 +135,7 @@ class TicketControlador extends Controlador
         $error = "No posee suficiente saldo";
       }
       if($errorCode == "D002M"){
-        $error = "No posee suficiente saldo";
+        $error = "Ya uso todos los tickets que tiene";
       }
       if($errorCode == "D003M"){
         $error = "No puede comprar mas tickets";

@@ -4,31 +4,26 @@ namespace App\Controladores;
 
 use App\Modelos\Usuario;
 use App\Controladores\Controlador;
+use Chadicus\Slim\OAuth2\Http\RequestBridge;
+use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 
 class UsuarioControlador extends Controlador
 {
-  public function getList($request,$response)
-  {
-    if($request->hasHeader('token')) {
-      $todos = Usuario::where('token',$request->getHeader('token'))->first();
-      if($todos) {
-        $todos = Usuario::whereNotNull('dni')->get();
-        return $response->withJson(
-          [
-            'resultado' => "Exito",
-            'salida' => $todos,
-            'numfilas' => $todos->count()
-          ]
-        );
-      }
-      return $response->withStatus(400)->withJson(
+  public function getList($request,$response){
+    $oauth2Request = RequestBridge::toOAuth2($request);
+    $token = $this->server->getAccessTokenData($oauth2Request);
+    $todos = Usuario::where('usu_dni',$token['user_id'])->first();
+    if($todos->tus_id!=0) {
+      return $response->withJson(
         [
-          'resultado' => "Token Invalido",
-          'numfilas' => 0
+          'resultado' => "Exito",
+          'salida' => $todos,
+          'numfilas' => 1
         ]
       );
     }
+    //ROL ADMINISTRADOR
     $todos = Usuario::all();
     return $response->withJson(
       [
@@ -206,8 +201,8 @@ class UsuarioControlador extends Controlador
 		}
 	}
 
-/*
-public function postImagen($request,$response,$args)
+
+public function postImagen($request,$response)
 {
   try{
     $imagepath = 'assets/comedor/usuario/'.uniqid('img_').'.png';
@@ -227,10 +222,12 @@ public function postImagen($request,$response,$args)
 			copy($pngfile,$imagepath);
 			unlink($pngfile);
     }
-    $todos = Usuario::where('id',args['id'])->first();
+    $oauth2Request = RequestBridge::toOAuth2($request);
+    $token = $this->server->getAccessTokenData($oauth2Request);
+    $todos = Usuario::where('usu_dni',$token['user_id'])->first();
     $todos->update([
       'image'=>$imagepath
-    ])
+    ]);
     return $response->withStatus(201)->withJson(
         [
           'resultado' => "Imagen subida con Exito",
@@ -255,5 +252,5 @@ public function postImagen($request,$response,$args)
         ]
       );
     }
-  }*/
+  }
 }

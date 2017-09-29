@@ -23,7 +23,6 @@ class Usuario extends Model{
   const UPDATED_AT = 'modificado';
 
 	protected $table = 'tbl_usuarios';
-	//protected $primaryKey = 'idusuario';
 	protected $primaryKey = 'usu_id';
 
   use Eloquence, Mappable, Mutable;
@@ -89,21 +88,15 @@ class Usuario extends Model{
 	];
 
   protected $setterMutators = [
-        'usu_nombre' => 'strtolower',
-        'usu_apellido' => 'strtolower',
-    ];
+      'usu_nombre' => 'strtolower',
+      'usu_apellido' => 'strtolower',
+  ];
   protected $getterMutators = [
-        'usu_nombre' => 'strtolower|ucwords',
-        'usu_apellido' => 'strtolower|ucwords',
-    ];
+      'usu_nombre' => 'strtolower|ucwords',
+      'usu_apellido' => 'strtolower|ucwords',
+  ];
 
-
-	public function productos(){
-			return $this->hasMany('App\Modelos\Almacen\Producto','usu_id','usu_id');
-			//return $this->hasMany('App\Models\ListaCompraProducto','idusuario','idusuarios');
-		}
-	public function locales(){
-			return $this->hasMany('App\Modelos\Almacen\Producto','usu_id','usu_id');
-			//return $this->hasMany('App\Models\ListaCompraProducto','idusuario','idusuarios');
-		}
+  public function tipoUsuario(){
+			return $this->belongsTo('App\Modelos\Usuario','tus_id');
+	}
 }

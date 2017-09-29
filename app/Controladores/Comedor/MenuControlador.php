@@ -7,21 +7,23 @@ use App\Modelos\Comedor\Menu;
 use App\Modelos\Comedor\Ticket;
 use App\Controladores\Controlador;
 use Illuminate\Support\Facades\DB;
+use Chadicus\Slim\OAuth2\Http\RequestBridge;
+use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 
-class MenuControlador extends Controlador
-{
-  public function getList($request,$response)
-  {
+class MenuControlador extends Controlador{
+
+  public function getList($request,$response){
     $todos = Menu::all();
-    if($request->hasHeader('token')){
-      $us = Usuario::where('usu_token',$request->getHeader('token')[0])->first();
-      if($us){
+    $oauth2Request = RequestBridge::toOAuth2($request);
+    $token = $this->server->getAccessTokenData($oauth2Request);
+    $us = Usuario::where('usu_dni',$token['user_id'])->first();
+    if($us->tus_id!=0){
         if ($us->tickets > 0) {
           $ticket = Ticket::where('usu_id',$us->id)->pluck('men_id');
           $todos = Menu::whereNotIn('men_id',$ticket)->
-          whereDate('men_fecha','>=',date('Y-m-d'))->
-          where('men_finalizado','0')->get();
+            whereDate('men_fecha','>=',date('Y-m-d'))->
+            where('men_finalizado','0')->get();
         } else {
           return $response->withStatus(400)->withJson(
             [
@@ -38,14 +40,6 @@ class MenuControlador extends Controlador
             ]
           );
         }
-      } else {
-        return $response->withStatus(400)->withJson(
-          [
-            'resultado' => "No existe el Usuario",
-            'numfilas' => 0
-          ]
-        );
-      }
     }elseif($request->hasHeader('fecha')){
       $date = strtotime($request->getHeader('fecha')[0]);
       $todos = Menu::where('men_fecha',date('Y-m-d',$date))->first();
