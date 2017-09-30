@@ -6,9 +6,11 @@ use Chadicus\Slim\OAuth2\Middleware;
 $authMiddleware = new Middleware\Authorization($container['server'], $container);
 
 $app->any('/','AutenticacionControlador:inicio');
+$app->get('/swagger','AutenticacionControlador:swagger');
+
 $app->post('/token','AutenticacionControlador:token');
-$app->post('/recurso','AutenticacionControlador:recurso');
-$app->post('/autorizar','AutenticacionControlador:autorizar');
+//$app->post('/recurso','AutenticacionControlador:recurso');
+$app->post('/authorize','AutenticacionControlador:authorize');
 
 $app->post('/acceder','AutenticacionControlador:acceder');
 $app->post('/registrar','AutenticacionControlador:registrar')
@@ -19,7 +21,7 @@ $app->post('/registrar','AutenticacionControlador:registrar')
     'contraseña' => v::notEmpty()->length(8,128)
   )));
 
-  //AUTENTICACION POR OAUTH
+///////////////////AUTENTICACION POR OAUTH
 $app->group('', function () {
 
   $this->get('/usuario/acceder','AutenticacionControlador:signup');

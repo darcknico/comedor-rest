@@ -30,7 +30,7 @@ $container['db'] = function ($container) {
 $app->getContainer()->get("db");
 
 $container['view'] = function($container){
-	$view = new \Slim\Views\Twig(__DIR__ . '/../resources/views' , [
+	$view = new \Slim\Views\Twig(__DIR__ . '/../templates' , [
 		'cache' => false,
 		]);
 

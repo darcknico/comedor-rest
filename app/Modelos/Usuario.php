@@ -7,6 +7,9 @@ use Sofa\Eloquence\Eloquence;
 use Sofa\Eloquence\Mappable;
 use Sofa\Eloquence\Mutable;
 
+/**
+ * @SWG\Definition()
+ */
 class Usuario extends Model{
 	/**
      * The name of the "created at" column.
@@ -38,6 +41,16 @@ class Usuario extends Model{
     'condicion' => 'usu_estado',
   ];
 
+  /**
+   * Numero de documento del Usuario
+   * @var int
+   *
+   * @SWG\Property(
+   *   property="dni",
+   *   type="integer",
+   *   description="Identificador del usuario"
+   * )
+   */
   protected $appends  = [
     'id',
     'dni',

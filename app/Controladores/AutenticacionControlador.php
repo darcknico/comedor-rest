@@ -10,11 +10,64 @@ use Chadicus\Slim\OAuth2\Http\RequestBridge;
 use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 /**
- * @SWG\Info(title="My First API", version="0.1")
+ * @SWG\Swagger(
+ *     schemes={"http"},
+ *     host="http://vps142351.vps.ovh.ca/proyectos/comedor-rest/public",
+ *     basePath="/",
+ *     @SWG\Info(
+ *         version="1.0.0",
+ *         title="AppComedor REST",
+ *         description="Este es un simple servidor para la gestion del Ticket en la compra de menus en el comedor Universitario.",
+ *         @SWG\Contact(
+ *             email="nicolasrl2005@gmail.com"
+ *         )
+ *     )
+ * )
+ */
+
+/**
+ * @SWG\SecurityScheme(
+ *   securityDefinition="comedor_auth",
+ *   type="oauth2",
+ *   authorizationUrl="http://localhost/proyectos/comedor-rest/public/authorize",
+ *   tokenUrl="http://localhost/proyectos/comedor-rest/public/token",
+ *   flow="password",
+ *   scopes={
+ *     "basico": "Alumno",
+ *     "medio": "?",
+ *     "completo": "Administrador"
+ *   }
+ * )
+ */
+
+ /**
+ * @SWG\Tag(
+ *   name="autenticacion",
+ *   description="Sistema de autenticacion en la api"
+ * )
+ * @SWG\Tag(
+ *   name="usuario",
+ *   description="Procedmientos para el usuario"
+ * )
+ * @SWG\Tag(
+ *   name="menu",
+ *   description="Todo lo que tenga que ver acerca de la minuta"
+ * )
+ * @SWG\Tag(
+ *   name="ticket",
+ *   description="Controlador de los tickets comprados por los menus"
+ * )
+ * @SWG\Tag(
+ *   name="transaccion",
+ *   description="Operaciones acerca del pago o recarga de saldo"
+ * )
  */
 class AutenticacionControlador extends Controlador
 {
   public function inicio($request,$response){
+    return $this->view->render($response,'index.twig');
+  }
+  public function swagger($request,$response){
     $swagger = \Swagger\scan(__DIR__. '/../');
     header('Content-Type: application/json');
     return $response->withJson($swagger);
@@ -22,6 +75,12 @@ class AutenticacionControlador extends Controlador
   public function token($request,$response){
     $oauth2Request = RequestBridge::toOAuth2($request);
     $oauth2Response = $this->server->handleTokenRequest($oauth2Request);
+    return ResponseBridge::fromOAuth2($oauth2Response);
+  }
+  public function authorize($request,$response){
+    $oauth2Request = RequestBridge::toOAuth2($request);
+    $oauth2Response  = new OAuth2\Response();
+    $this->server->handleAuthorizeRequest($oauth2Request,$oauth2Response,true);
     return ResponseBridge::fromOAuth2($oauth2Response);
   }
 
@@ -120,11 +179,20 @@ class AutenticacionControlador extends Controlador
 	}
 
   /**
-  * @SWG\Get(
-  *     path="/api/resource.json",
-  *     @SWG\Response(response="200", description="An example resource")
-  * )
-  */
+   * @SWG\Post(
+   *   path="/registrar",
+   *   summary="Agregar un nuevo usuario",
+   *   description="Api para crear un nuevo usuario",
+   *   @SWG\Response(
+   *     response=200,
+   *     description="Usuario agregado"
+   *   ),
+   *   @SWG\Response(
+   *     response=400,
+   *     description="Error en el ingreso de datos"
+   *   )
+   * )
+   */
 	public function registrar($request,$response)
 	{
     if($request->getAttribute('has_errors')){
