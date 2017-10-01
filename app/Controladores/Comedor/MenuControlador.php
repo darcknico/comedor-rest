@@ -12,11 +12,70 @@ use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 
 class MenuControlador extends Controlador{
-
+/**
+* @SWG\Get(
+*   path="/menu",
+*   tags={"menu"},
+*   summary="Listado de todos los menus, o menus sin comprar, o menu de la fecha",
+*   description="Para obtener una lista de menus registrados debe estar autenticado como Administrador. En otro caso la respuesta es otro listado de menus que aun no compro el usuario a partir de la fecha actual",
+*   operationId="getList",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="fecha",
+*     in="query",
+*     description="Fecha del menu a buscar",
+*     type="string"
+*   ),
+*
+*   @SWG\Response(
+*         response=200,
+*         description="Listado de menus. Si ingreso una fecha la salida sera solo un objeto y no un array",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="array",
+*                 @SWG\Items(type="object",ref="#/definitions/Menu"),
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Ocurrio un error al buscar los menus. el resultado varia",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                enum={"No tiene Menus disponibles","No existe Menu restantes","No existe Menu para la Fecha: "},
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
   public function getList($request,$response){
     $todos = Menu::all();
     $oauth2Request = RequestBridge::toOAuth2($request);
+    // obtiendo las credenciales del token
     $token = $this->server->getAccessTokenData($oauth2Request);
+    // buscando al usuario del comedor
     $us = Usuario::where('usu_dni',$token['user_id'])->first();
     if($us->tus_id!=0){
         if ($us->tickets > 0) {

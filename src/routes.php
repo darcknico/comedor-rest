@@ -3,16 +3,16 @@
 use Respect\Validation\Validator as v;
 use Chadicus\Slim\OAuth2\Middleware;
 
-$authMiddleware = new Middleware\Authorization($container['server'], $container);
-
-$app->any('/','AutenticacionControlador:inicio');
-$app->get('/swagger','AutenticacionControlador:swagger');
-
+$app->any('/','Swagger:inicio');
+$app->get('/swagger','Swagger:get');
 $app->post('/token','AutenticacionControlador:token');
-//$app->post('/recurso','AutenticacionControlador:recurso');
 $app->post('/authorize','AutenticacionControlador:authorize');
 
-$app->post('/acceder','AutenticacionControlador:acceder');
+$app->post('/acceder','AutenticacionControlador:acceder')->add(new \DavidePastore\Slim\Validation\Validation(
+  array(
+    'dni' => v::notEmpty(),
+    'contraseña' => v::notEmpty()
+  )));
 $app->post('/registrar','AutenticacionControlador:registrar')
 ->add(new \DavidePastore\Slim\Validation\Validation(
   array(

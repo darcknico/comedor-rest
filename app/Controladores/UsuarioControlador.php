@@ -10,11 +10,48 @@ use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 class UsuarioControlador extends Controlador
 {
+/**
+* @SWG\Get(
+*   path="/usuario",
+*   tags={"usuario"},
+*   summary="Obtiene una lista de usuarios, o el Usuario quien realiza la consulta",
+*   description="Para obtener una lista de usuarios registrados solo en el servidor del comedor-rest se debe tener como el tipo usuario Administrador. En cualquier otro caso el resultado devuelve al usuario quien consulta",
+*   operationId="getList",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*
+*   @SWG\Response(
+*         response=200,
+*         description="Atencion que puede devolver un array o solo un objecto, Segun el tipo de usuario quien realiza la peticion",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="array",
+*                 @SWG\Items(type="object",ref="#/definitions/Usuario"),
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
   public function getList($request,$response){
     $oauth2Request = RequestBridge::toOAuth2($request);
     $token = $this->server->getAccessTokenData($oauth2Request);
     $todos = Usuario::where('usu_dni',$token['user_id'])->first();
     if($todos->tus_id!=0) {
+      //ROL USUARIO
       return $response->withJson(
         [
           'resultado' => "Exito",
@@ -34,6 +71,83 @@ class UsuarioControlador extends Controlador
     );
   }
 
+/**
+* @SWG\Get(
+*   path="/usuario/{id}",
+*   tags={"usuario"},
+*   summary="Obtiene al usuario por el identificador unico",
+*   description="",
+*   operationId="get",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*
+*   @SWG\Response(
+*         response=200,
+*         description="",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="object",
+*                 ref="#/definitions/Usuario",
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
   public function get($request,$response,$args)
 	{
 		try {
