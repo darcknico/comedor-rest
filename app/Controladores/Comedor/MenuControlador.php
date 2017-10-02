@@ -9,6 +9,7 @@ use App\Controladores\Controlador;
 use Illuminate\Support\Facades\DB;
 use Chadicus\Slim\OAuth2\Http\RequestBridge;
 use Chadicus\Slim\OAuth2\Http\ResponseBridge;
+use Monolog\Handler\NullHandler;
 
 
 class MenuControlador extends Controlador{
@@ -127,45 +128,214 @@ class MenuControlador extends Controlador{
       ]
     );
   }
-
+/**
+* @SWG\Get(
+*   path="/menu/{id}",
+*   tags={"menu"},
+*   summary="Obtener un Menu",
+*   description="Busca el menu por el id ingresado en el path",
+*   operationId="get",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="id",
+*     in="path",
+*     description="Numero identificatorio del menu",
+*     type="integer"
+*   ),
+*
+*   @SWG\Response(
+*         response=200,
+*         description="",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="object",
+*                 ref="#/definitions/Menu",
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Ingreso un id de menu inexistente",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                example="No existe el Menu",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
   public function get($request,$response,$args)
 	{
-		try {
-			$todos = Menu::where('men_id',$args['id'])->first();
-      if($todos){
-        return $response->withJson(
-          [
-            'resultado' => "Exito",
-            'salida' => $todos,
-            'numfilas' => 1
-          ]
-        );
-      }
-      return $response->withStatus(400)->withJson(
+		$todos = Menu::where('men_id',$args['id'])->first();
+    if($todos){
+      return $response->withJson(
         [
-          'resultado' => "No existe el Menu",
-          'numfilas' => 0
+          'resultado' => "Exito",
+          'salida' => $todos,
+          'numfilas' => 1
         ]
       );
-		} catch (\Illuminate\Database\QueryException $e) {
-      return $response->withStatus(403)->withJson(
-        [
-          'resultado' => "Error en Base de Datos",
-          'salida' => $e->errorInfo[2],
-          'numfilas' => 0
-        ]
-      );
-		} catch (\Exception $e) {
-      return $response->withStatus(501)->withJson(
-        [
-          'resultado' => "Error no definido",
-          'salida' => $e->getMessage(),
-          'numfilas' => 0
-        ]
-      );
-		}
+    }
+    return $response->withStatus(400)->withJson(
+      [
+        'resultado' => "No existe el Menu",
+        'numfilas' => 0
+      ]
+    );
 	}
 
+/**
+* @SWG\Post(
+*   path="/menu",
+*   tags={"menu"},
+*   summary="Agrega un menu",
+*   description="",
+*   operationId="post",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="Body",
+*     in="body",
+*     description="Cuerpo del json a enviar",
+*     required=true,
+*     @SWG\Schema(
+*        @SWG\Property(
+*            property="fecha",
+*            type="string",
+*        ),
+*        @SWG\Property(
+*            property="cantidad",
+*            type="integer"
+*        ),
+*        @SWG\Property(
+*            property="precio",
+*            type="string",
+*        ),
+*        @SWG\Property(
+*            property="descripcion",
+*            type="string"
+*        ),
+*     ),
+*   ),
+*
+*   @SWG\Response(
+*         response=201,
+*         description="",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Creacion con Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="object",
+*                 ref="#/definitions/Menu",
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Se a encontrado al menos un error en la validacion de los datos de entrada, por lo que devuelve un array de String de errores por cada dato ingresado",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en los Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="object",
+*                @SWG\Property(
+*                   property="fecha",
+*                   type="array",
+*                   @SWG\Items(type="string")
+*                ),
+*                @SWG\Property(
+*                   property="cantidad",
+*                   type="array",
+*                   @SWG\Items(type="string")
+*                ),
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
 	public function post($request,$response)
 	{
     if($request->getAttribute('has_errors')){
@@ -232,25 +402,128 @@ class MenuControlador extends Controlador{
           'numfilas' => 0
         ]
       );
-  } catch (\Illuminate\Database\QueryException $e) {
-    return $response->withStatus(403)->withJson(
-      [
-        'resultado' => "Error en Base de Datos",
-        'salida' => $e->errorInfo[2],
-        'numfilas' => 0
-      ]
-    );
-  } catch (\Exception $e) {
-    return $response->withStatus(501)->withJson(
-      [
-        'resultado' => "Error no definido",
-        'salida' => $e->getMessage(),
-        'numfilas' => 0
-      ]
-    );
-  }
+    } catch (\Illuminate\Database\QueryException $e) {
+      return $response->withStatus(403)->withJson(
+        [
+          'resultado' => "Error en Base de Datos",
+          'salida' => $e->errorInfo[2],
+          'numfilas' => 0
+        ]
+      );
+    } catch (\Exception $e) {
+      return $response->withStatus(501)->withJson(
+        [
+          'resultado' => "Error no definido",
+          'salida' => $e->getMessage(),
+          'numfilas' => 0
+        ]
+      );
+    }
 	}
 
+/**
+* @SWG\Post(
+*   path="/menu/{id}",
+*   tags={"menu"},
+*   summary="Cierra el menu",
+*   description="Durante el dia del menu se puede finalizar el menu para no poder seguir ingresando validacion de tickets. Y aquellos tickets sin validar que esten como activos pasan a estar vencidos",
+*   operationId="post",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="id",
+*     in="path",
+*     description="Numero identificatorio del menu",
+*     type="integer"
+*   ),
+*
+*   @SWG\Response(
+*         response=200,
+*         description="",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Finalizacion con Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="object",
+*                 ref="#/definitions/Menu",
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Esta accion tiene que ejecutarse en el dia de la fecha del menu y en una franja horaria especificada",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en los Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*                example="Modificacion sin Exito",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
 	public function finalizar($request,$response,$args)
 	{
     if($request->getAttribute('has_errors')){
@@ -265,10 +538,18 @@ class MenuControlador extends Controlador{
     try{
       $todos = Menu::where('men_id',$args['id'])->first();
       if($todos) {
+        /*
+        Falta agregar logica de reglas de finalizacion del menu
+        por ejemplo si estamos en el dia del menu, o si son las 3 de la tarde
+        */
   			$todos->update([
   				'finalizado' => true
   				]);
-        return $response->withJson(
+        $tickets = Ticket::where('men_id',$args['id'])->get();
+        $tickets->update([
+  				'tic_estado' => "Vencido"
+  				]);
+        return $response->withStatus(200)->withJson(
             [
               'resultado' => "Finalizacion con Exito",
               'salida' => $todos,
@@ -301,6 +582,133 @@ class MenuControlador extends Controlador{
 		}
 	}
 
+/**
+* @SWG\Put(
+*   path="/menu/{id}",
+*   tags={"menu"},
+*   summary="Modifica un menu",
+*   description="",
+*   operationId="put",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="id",
+*     in="path",
+*     description="Numero identificatorio del menu",
+*     type="integer"
+*   ),
+*   @SWG\Parameter(
+*     name="Body",
+*     in="body",
+*     description="Cuerpo del json a enviar",
+*     required=true,
+*     @SWG\Schema(
+*        @SWG\Property(
+*            property="cantidad",
+*            type="integer"
+*        ),
+*        @SWG\Property(
+*            property="precio",
+*            type="string",
+*        ),
+*        @SWG\Property(
+*            property="descripcion",
+*            type="string"
+*        ),
+*     ),
+*   ),
+*
+*   @SWG\Response(
+*         response=200,
+*         description="",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Modificacion con Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="object",
+*                 ref="#/definitions/Menu",
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Se a encontrado al menos un error en la validacion de los datos de entrada, por lo que devuelve un array de String de errores por cada dato ingresado. Atencion puede exister otro error de no encontrar el menu por lo que en ese caso solo devuelve en la salida un String",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en los Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="object",
+*                @SWG\Property(
+*                   property="cantidad",
+*                   type="array",
+*                   @SWG\Items(type="string")
+*                ),
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
   public function put($request,$response,$args)
 	{
     if($request->getAttribute('has_errors')){
