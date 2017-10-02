@@ -30,7 +30,7 @@ $container['db'] = function ($container) {
 $app->getContainer()->get("db");
 
 $container['view'] = function($container){
-	$view = new \Slim\Views\Twig(__DIR__ . '/../templates' , [
+	$view = new \Slim\Views\Twig(__DIR__ . '/../recursos/vistas' , [
 		'cache' => false,
 		]);
 
@@ -38,7 +38,6 @@ $container['view'] = function($container){
 		$container->router,
 		$container->request->getUri()
 		));
-
 	return $view;
 };
 
@@ -57,6 +56,10 @@ $container['TransaccionControlador'] = function ($container) {
 };
 $container['AutenticacionControlador'] = function ($container) {
 	return new \App\Controladores\AutenticacionControlador($container);
+};
+
+$container['Swagger'] = function ($container) {
+	return new \App\Swagger($container);
 };
 
 $container['server'] = function ($container) {
@@ -88,7 +91,7 @@ $container['http'] = function ($container){
   return new \GuzzleHttp\Client([
     'headers' => [ 'Content-Type' => 'application/json' ],
     //'base_uri' => 'http://proyectosinformaticos.esy.es/apirest.slim/public/',
-    'base_uri' => 'http://localhost/proyectos/comedor-rest/public/',
+    'base_uri' => $container->request->getUri()->getBaseUrl().'/public',
     'timeout'  => 10.0,
   ]);
 };

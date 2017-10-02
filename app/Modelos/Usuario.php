@@ -8,7 +8,7 @@ use Sofa\Eloquence\Mappable;
 use Sofa\Eloquence\Mutable;
 
 /**
- * @SWG\Definition()
+ * @SWG\Definition(required={"menu", "contraseña","nombre"}, type="object", @SWG\Xml(name="Usuario"))
  */
 class Usuario extends Model{
 	/**
@@ -41,16 +41,43 @@ class Usuario extends Model{
     'condicion' => 'usu_estado',
   ];
 
-  /**
-   * Numero de documento del Usuario
-   * @var int
-   *
-   * @SWG\Property(
-   *   property="dni",
-   *   type="integer",
-   *   description="Identificador del usuario"
-   * )
-   */
+/**
+ * Numero de documento del Usuario
+ * @var int
+ *
+ * @SWG\Property(
+ *   property="dni",
+ *   type="integer",
+ *   example="35048026",
+ *   description="Identificador unico del usuario"
+ * )
+ *
+ * Password o Contraseña usada para autenticarcion
+ * @var string
+ *
+ * @SWG\Property(
+ *   property="contraseña",
+ *   type="string",
+ *   description="Contraseña del usuario"
+ * )
+ *
+ * Nombre Completo del usuario
+ * @var string
+ *
+ * @SWG\Property(
+ *   property="nombre",
+ *   type="string",
+ *   description="Nombre del usuario"
+ * )
+ * Apellido Completo del usuario
+ * @var string
+ *
+ * @SWG\Property(
+ *   property="apellido",
+ *   type="string",
+ *   description="Nombre del usuario"
+ * )
+ */
   protected $appends  = [
     'id',
     'dni',
