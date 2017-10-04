@@ -11,11 +11,47 @@ use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 class AutenticacionControlador extends Controlador
 {
+
+/**
+ * @SWG\Post(
+ *   path="/token",
+ *   tags={"autenticacion"},
+ *   summary="",
+ *   description="",
+ *   operationId="token",
+ *   consumes={"application/json"},
+ *   produces={"application/json"},
+ *   @SWG\Response(
+ *         response=200,
+ *         description="",
+ *         @SWG\Schema(
+ *         ),
+ *     ),
+ * )
+ */
   public function token($request,$response){
     $oauth2Request = RequestBridge::toOAuth2($request);
     $oauth2Response = $this->server->handleTokenRequest($oauth2Request);
     return ResponseBridge::fromOAuth2($oauth2Response);
   }
+
+/**
+ * @SWG\Post(
+ *   path="/authorize",
+ *   tags={"autenticacion"},
+ *   summary="",
+ *   description="",
+ *   operationId="authorize",
+ *   consumes={"application/json"},
+ *   produces={"application/json"},
+ *   @SWG\Response(
+ *         response=200,
+ *         description="",
+ *         @SWG\Schema(
+ *         ),
+ *     ),
+ * )
+ */
   public function authorize($request,$response){
     $oauth2Request = RequestBridge::toOAuth2($request);
     $oauth2Response  = new OAuth2\Response();
@@ -163,9 +199,6 @@ class AutenticacionControlador extends Controlador
  *             ),
  *         ),
  *     ),
- *   security={{
- *     "comedor_auth": {"basico"}
- *   }}
  * )
  */
   public function acceder($request,$response)
