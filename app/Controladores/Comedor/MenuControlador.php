@@ -139,7 +139,7 @@ class MenuControlador extends Controlador{
 *   produces={"application/json"},
 *   @SWG\Parameter(
 *     name="id",
-*     in="path",
+*     in="query",
 *     description="Numero identificatorio del menu",
 *     type="integer"
 *   ),
@@ -432,7 +432,7 @@ class MenuControlador extends Controlador{
 *   produces={"application/json"},
 *   @SWG\Parameter(
 *     name="id",
-*     in="path",
+*     in="query",
 *     description="Numero identificatorio del menu",
 *     type="integer"
 *   ),
@@ -545,7 +545,7 @@ class MenuControlador extends Controlador{
   			$todos->update([
   				'finalizado' => true
   				]);
-        $tickets = Ticket::where('men_id',$args['id'])->get();
+        $tickets = Ticket::where('men_id',$args['id'])->where('tic_estado','Activo')->get();
         $tickets->update([
   				'tic_estado' => "Vencido"
   				]);
@@ -593,7 +593,7 @@ class MenuControlador extends Controlador{
 *   produces={"application/json"},
 *   @SWG\Parameter(
 *     name="id",
-*     in="path",
+*     in="query",
 *     description="Numero identificatorio del menu",
 *     type="integer"
 *   ),

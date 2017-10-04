@@ -11,7 +11,110 @@ use Chadicus\Slim\OAuth2\Http\ResponseBridge;
 
 
 class TicketControlador extends Controlador{
-
+/**
+* @SWG\Get(
+*   path="/ticket",
+*   tags={"ticket"},
+*   summary="Tickets pretenecientes al usuario o por codigo",
+*   description="Obtiene un listado de tickets, tambien se puede filtrar por estado. Si es pasado un codigo, el endpoint procede a devolver el ticket asociado",
+*   operationId="getList",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="estado",
+*     in="query",
+*     description="Estado asociado al Ticket",
+*     type="string"
+*   ),
+*   @SWG\Parameter(
+*     name="codigo",
+*     in="query",
+*     description="Codigo identificatorio del ticekt",
+*     type="string"
+*   ),
+*
+*   @SWG\Response(
+*         response=200,
+*         description="Listado de tickets. Si es que ingreso un ticket puede devolver un objeto en vez de un array.",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="array",
+*                 @SWG\Items(type="object",ref="#/definitions/Ticket"),
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Ocurrio un error al buscar los menus. el resultado varia",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                example="Codigo del Ticket Invalido",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
   public function getList($request,$response){
     try{
       if($request->hasHeader('codigo')) {
@@ -25,7 +128,7 @@ class TicketControlador extends Controlador{
             ]
           );
         }
-        return $response->withStatus(403)->withJson(
+        return $response->withStatus(400)->withJson(
           [
             'resultado' => "Codigo del Ticket Invalido",
             'numfilas' => 0
@@ -66,7 +169,103 @@ class TicketControlador extends Controlador{
       );
 		}
   }
-
+/**
+* @SWG\Get(
+*   path="/ticket/{id}",
+*   tags={"ticket"},
+*   summary="Obtene un ticket",
+*   description="",
+*   operationId="get",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="id",
+*     in="query",
+*     description="Identificador asociado al Ticket",
+*     type="string"
+*   ),
+*   @SWG\Response(
+*         response=200,
+*         description="Devuelve un objeto ticket.",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="array",
+*                 @SWG\Items(type="object",ref="#/definitions/Ticket"),
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Ocurrio un error.",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                example="Numero identificatorio del ticket no existe",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
   public function get($request,$response,$args)
   {
     try{
@@ -80,9 +279,9 @@ class TicketControlador extends Controlador{
           ]
         );
       }
-      return $response->withStatus(403)->withJson(
+      return $response->withStatus(400)->withJson(
         [
-          'resultado' => "Ticket Invalido",
+          'resultado' => "Numero identificatorio del ticket no existe",
           'numfilas' => 0
         ]
       );
@@ -104,7 +303,88 @@ class TicketControlador extends Controlador{
       );
 		}
   }
-
+/**
+* @SWG\Post(
+*   path="/menu/{idMenu}/ticket",
+*   tags={"menu"},
+*   summary="Compra un ticket",
+*   description="",
+*   operationId="post",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="idMenu",
+*     in="query",
+*     description="Numero identificatorio del menu",
+*     type="string"
+*   ),
+*   @SWG\Response(
+*         response=200,
+*         description="Devuelve el ticket recien comprado",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Creacion con Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="array",
+*                 @SWG\Items(type="object",ref="#/definitions/Ticket"),
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Pueden ocurrir multiples errores al crear un ticket. Entre ellos son: si el ticket ya lo tiene comprado, no posee suficiente saldo o no puede comprar mas tickets.",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*                enum={"Usted ya tiene un ticket comprado","No posee suficiente saldo","Ya uso todos los tickets que tiene","No puede comprar mas tickets","Terminado consulta de forma imprevista"},
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
 	public function post($request,$response,$args)
 	{
 		try{
@@ -160,7 +440,103 @@ class TicketControlador extends Controlador{
       );
 		}
 	}
-
+/**
+* @SWG\Delete(
+*   path="/ticket/{id}",
+*   tags={"ticket"},
+*   summary="Descarta un ticket",
+*   description="Una vez que un ticket es comprado, tiene el estado como Activo, pero solo aquellos que esten hasta un dia anterior a la fecha del menu comprado o tengan estado Vencido, pueden darse de baja y descartarlo",
+*   operationId="delete",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="id",
+*     in="query",
+*     description="Numero identificador asociado al Ticket",
+*     type="string"
+*   ),
+*   @SWG\Response(
+*         response=200,
+*         description="Devuelve un objeto ticket.",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Cancelacion con Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="object",
+*                 ref="#/definitions/Ticket",
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Ocurrio un error con el ticket. el resultado varia",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                enum={"Ticket YA CANCELADO","No hay Registro"}
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth": {"basico"}
+*   }}
+* )
+*/
 	public function delete($request,$response,$args)
 	{
     try{
@@ -168,11 +544,10 @@ class TicketControlador extends Controlador{
 			$todos = Ticket::where('tic_id',$args['id'])->first();
       if($todos){
         if($todos->condicion == 'cancelado'){
-          return $response->withJson(
+          return $response->withStatus(400)->withJson(
             [
               'resultado' => "Ticket YA CANCELADO",
-              'salida' => $todos,
-              'numfilas' => 1
+              'numfilas' => 0
             ]
           );
         }
@@ -183,7 +558,7 @@ class TicketControlador extends Controlador{
           [
             'resultado' => "Cancelacion con Exito",
             'salida' => $todos,
-            'numfilas' => $todos->count()
+            'numfilas' => 1
           ]
         );
       }
@@ -211,10 +586,121 @@ class TicketControlador extends Controlador{
     );
   }
 	}
-
+/**
+* @SWG\Put(
+*   path="/ticket/{id}",
+*   tags={"ticket"},
+*   summary="Da como usado el ticket",
+*   description="Usado en la validacion de ticket con estado Activo para el menu de la fecha. Solo el usuario como rol de Administrador puede usar este endpoint.",
+*   operationId="delete",
+*   consumes={"application/json"},
+*   produces={"application/json"},
+*   @SWG\Parameter(
+*     name="id",
+*     in="query",
+*     description="Numero identificador asociado al Ticket",
+*     type="string"
+*   ),
+*   @SWG\Response(
+*         response=200,
+*         description="Devuelve un objeto ticket.",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Validacion con Exito"
+*             ),
+*             @SWG\Property(
+*                 property="salida",
+*                 type="object",
+*                 ref="#/definitions/Ticket",
+*             ),
+*             @SWG\Property(
+*                 property="numfilas",
+*                 type="integer",
+*                 example="1"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=400,
+*         description="Ocurrio un error con el ticket. el resultado varia",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                enum={"No es Administrador","Ticket YA USADO","Validacion sin Exito"}
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=403,
+*         description="Error encontrado al ejecutarse con la base de datos",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error en Base de Datos",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   @SWG\Response(
+*         response=501,
+*         description="Errores del lado del servidor",
+*         @SWG\Schema(
+*             @SWG\Property(
+*                property="resultado",
+*                type="string",
+*                example="Error no definido",
+*             ),
+*             @SWG\Property(
+*                property="salida",
+*                type="string",
+*             ),
+*             @SWG\Property(
+*                property="numfilas",
+*                type="integer",
+*                example="0"
+*             ),
+*         ),
+*     ),
+*   security={{
+*     "comedor_auth":{
+*       "basico": "Alumno",
+*       "completo": "Administrador"}
+*   }}
+* )
+*/
 	public function put($request,$response,$args)
 	{
     try{
+      $oauth2Request = RequestBridge::toOAuth2($request);
+      // obtiendo las credenciales del token
+      $token = $this->server->getAccessTokenData($oauth2Request);
+      // buscando al usuario del comedor
+      $us = Usuario::where('usu_dni',$token['user_id'])->first();
+      if($us->tus_id!=0){
+        return $response->withStatus(400)->withJson(
+          [
+            'resultado' => "No es Administrador",
+            'numfilas' => 0
+          ]
+        );
+      }
 			$input = $request->getParsedBody();
       $todos = Ticket::with('usuario')->with('menu')
         ->where('tic_id',$args['id'])
@@ -222,11 +708,10 @@ class TicketControlador extends Controlador{
         ->first();
       if($todos) {
         if($todos->estado == 'usado'){
-          return $response->withJson(
+          return $response->withStatus(400)->withJson(
             [
               'resultado' => "Ticket YA USADO",
-              'salida' => $todos,
-              'numfilas' => 1
+              'numfilas' => 0
             ]
           );
         }
@@ -241,7 +726,7 @@ class TicketControlador extends Controlador{
           ]
         );
       }
-      return $response->withStatus(403)->withJson(
+      return $response->withStatus(400)->withJson(
         [
           'resultado' => "Validacion sin Exito",
           'numfilas' => 0
