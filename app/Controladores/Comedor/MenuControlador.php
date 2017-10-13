@@ -547,7 +547,7 @@ class MenuControlador extends Controlador{
   				]);
         $tickets = Ticket::where('men_id',$args['id'])->where('tic_estado','Activo')->get();
         $tickets->update([
-  				'tic_estado' => "Vencido"
+  				'tic_estado' => "vencido"
   				]);
         return $response->withStatus(200)->withJson(
             [
