@@ -545,7 +545,7 @@ class MenuControlador extends Controlador{
   			$todos->update([
   				'finalizado' => true
   				]);
-        $tickets = Ticket::where('men_id',$args['id'])->where('tic_estado','Activo')->get();
+        $tickets = Ticket::where('men_id',$args['id'])->where('tic_estado','activo')->get();
         $tickets->update([
   				'tic_estado' => "vencido"
   				]);
