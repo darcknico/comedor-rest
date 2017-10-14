@@ -393,12 +393,19 @@ class TicketControlador extends Controlador{
       $us = Usuario::where('usu_dni',$token['user_id'])->first();
       $input = $request->getParsedBody();
       $menu = Menu::where('men_id',$args['idMenu'])->first();
-			$todos = Ticket::create([
+			$id = Ticket::create([
 				'men_id'=>$menu->id,
         'usu_id'=> $us->id,
         'tic_precio' => $menu->precio,
         'tic_fecha' => $menu->fecha,
-				]);
+				])->tic_id;
+      $todos = Ticket::where('tic_id',$id)->first();
+      $parteA = str_pad($token['user_id'], 6, "0", STR_PAD_LEFT);
+      $parteB = str_pad(date('dmY'), 6, "0", STR_PAD_LEFT);
+      $parteC = str_pad($id, 6, "0", STR_PAD_LEFT);
+      $todos->update([
+        'tic_codigo'=> $parteA.$parteB.$parteC,
+      ]);
       return $response->withJson(
         [
           'resultado' => "Creacion con Exito",

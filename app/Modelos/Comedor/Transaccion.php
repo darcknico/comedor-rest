@@ -25,11 +25,11 @@ class Transaccion extends Model{
 	//protected $table = 'tickets';
 	protected $primaryKey = 'tra_id';
 	protected $table = 'tbl_transacciones';
+  protected $dateFormat = 'Y-m-d';
   use Eloquence, Mappable, Mutable;
 
   protected $maps = [
     'id' => 'tra_id',
-    'idUsuario' => 'usu_id',
 		'concepto' => 'tra_concepto',
 		'token' => 'tra_token',
 		'monto' => 'tra_monto',
@@ -39,7 +39,6 @@ class Transaccion extends Model{
 
   protected $appends  = [
     'id',
-    'idUsuario',
 		'concepto',
 		'token',
 		'monto',
@@ -64,7 +63,7 @@ class Transaccion extends Model{
 		'tra_concepto',
 		'tra_token',
     'tra_monto',
-    'tra_fecha'.
+    'tra_fecha',
     'tra_estado',
     'paymentMethodId',
     'cardIssuerId',
