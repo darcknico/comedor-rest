@@ -543,9 +543,9 @@ class MenuControlador extends Controlador{
         por ejemplo si estamos en el dia del menu, o si son las 3 de la tarde
         */
   			$todos->update([
-  				'finalizado' => true
+  				'men_finalizado' => true
   				]);
-        $tickets = Ticket::where('men_id',$args['id'])->where('tic_estado','activo')->get();
+        $tickets = Ticket::where('men_id',$args['id'])->where('tic_estado','activo');
         $tickets->update([
   				'tic_estado' => "vencido"
   				]);
