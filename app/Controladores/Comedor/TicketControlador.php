@@ -715,10 +715,10 @@ class TicketControlador extends Controlador{
         ->where('men_id',$input['idMenu'])
         ->first();
       if($todos) {
-        if($todos->estado == 'usado'){
+        if($todos->tic_estado == 'usado'){
           return $response->withStatus(400)->withJson(
             [
-              'resultado' => "Ticket YA USADO",
+              'resultado' => "El ticket estaba usado",
               'numfilas' => 0
             ]
           );

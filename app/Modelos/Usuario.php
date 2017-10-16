@@ -38,6 +38,7 @@ class Usuario extends Model{
     'saldo' => 'usu_saldo',
     'tickets' => 'usu_tickets',
     'condicion' => 'usu_estado',
+    'imagen' => 'usu_image',
   ];
 
 /**
@@ -85,6 +86,7 @@ class Usuario extends Model{
     'saldo',
     'tickets',
     'condicion',
+    'imagen',
   ];
 
   public function getUsuSaldoAttribute($value)
@@ -115,6 +117,7 @@ class Usuario extends Model{
     'usu_saldo',
     'usu_tickets',
     'usu_estado',
+    'usu_image',
   ];
 
 	protected $fillable = [
@@ -122,7 +125,9 @@ class Usuario extends Model{
 		'usu_nombre',
 		'usu_apellido',
     'usu_contraseña',
-		'usu_token'
+		'usu_token',
+    'usu_image',
+    'estado'
 	];
 
   protected $setterMutators = [

@@ -233,11 +233,24 @@ class UsuarioControlador extends Controlador
 
 	public function delete($request,$response,$args)
 	{
+    $oauth2Request = RequestBridge::toOAuth2($request);
+    $token = $this->server->getAccessTokenData($oauth2Request);
+    $todos = Usuario::where('usu_dni',$token['user_id'])->first();
     $input = $request->getParsedBody();
+    if($todos->tus_id!=0) {
+      return $response->withStatus(403)->withJson(
+        [
+          'resultado' => "No posee lo permisos necesarios",
+          'numfilas' => 0
+        ]
+      );
+    }
     try{
 			$todos = Usuario::where('usu_id',$args['id'])->first();
       if ($todos) {
-        $todos->delete();
+        $todos->update([
+          'estado' => 0,
+        ]);
         return $response->withJson(
           [
             'resultado' => "Eliminacion con Exito",

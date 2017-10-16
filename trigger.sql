@@ -100,8 +100,9 @@ create or replace function fn_cancelar_ticket() returns trigger as
 $$
 estadoOld = TD["old"]["tic_estado"]
 estadoNew = TD["new"]["tic_estado"]
-menu = TD["new"]["men_id"]
-precio = TD["new"]["tic_precio"]
+menu = TD["old"]["men_id"]
+precio = TD["old"]["tic_precio"]
+usuario = TD["old"]["usu_id"]
 if(estadoOld=="cancelado" and estadoNew=="cancelado"):
 	raise type('MyError', (plpy.SPIError,), {'sqlstate': 'D000M'})
 	plpy.error("No puede cancelar este ticket")
@@ -138,9 +139,17 @@ if(estadoOld=="vencido" and estadoNew=="cancelado"):
 	""",["int"])
 	plpy.execute(consulta,[usuario])
 	return "OK"
-else:
-	raise type('MyError', (plpy.SPIError,), {'sqlstate': 'D001M'})
-	plpy.error("Terminacion imprevista")
-return "SKIP"
+if(estadoOld=="activo" and estadoNew=="usado"):
+	consulta = plpy.prepare("""
+	update
+		tbl_usuarios
+	set
+		usu_tickets = usu_tickets + 1
+	where
+		usu_id = $1
+	""",["int"])
+	plpy.execute(consulta,[usuario])
+	return "OK"
+return "OK"
 $$
 language plpython3u;
