@@ -1,4 +1,4 @@
-create or replace function comprar_ticket() returns trigger as
+create or replace function fn_comprar_ticket() returns trigger as
 $$
 consulta = plpy.prepare("""
 select
@@ -93,5 +93,54 @@ parteB = fecha.strftime('%y%m%d').zfill(6)
 ticket = TD["new"]["tic_id"]
 parteC = str(ticket).zfill(6)
 plpy.execute(consulta,[parteA+parteB+parteC,ticket])
+$$
+language plpython3u;
+
+create or replace function fn_cancelar_ticket() returns trigger as
+$$
+estadoOld = TD["old"]["tic_estado"]
+estadoNew = TD["new"]["tic_estado"]
+menu = TD["new"]["men_id"]
+precio = TD["new"]["tic_precio"]
+if(estadoOld=="cancelado" and estadoNew=="cancelado"):
+	raise type('MyError', (plpy.SPIError,), {'sqlstate': 'D000M'})
+	plpy.error("No puede cancelar este ticket")
+if(estadoOld=="activo" and estadoNew=="cancelado"):
+	consulta = plpy.prepare("""
+	update
+		tbl_menus
+	set
+		men_comprados = men_comprados - 1,
+		men_restantes = men_restantes + 1
+	where
+		men_id = $1
+	""",["int"])
+	plpy.execute(consulta,[menu])
+	consulta = plpy.prepare("""
+	update
+		tbl_usuarios
+	set
+		usu_saldo = usu_saldo + $1,
+		usu_tickets = usu_tickets + 1
+	where
+		usu_id = $2
+	""",["decimal","int"])
+	plpy.execute(consulta,[precio,usuario])
+	return "OK"
+if(estadoOld=="vencido" and estadoNew=="cancelado"):
+	consulta = plpy.prepare("""
+	update
+		tbl_usuarios
+	set
+		usu_tickets = usu_tickets + 1
+	where
+		usu_id = $1
+	""",["int"])
+	plpy.execute(consulta,[usuario])
+	return "OK"
+else:
+	raise type('MyError', (plpy.SPIError,), {'sqlstate': 'D001M'})
+	plpy.error("Terminacion imprevista")
+return "SKIP"
 $$
 language plpython3u;

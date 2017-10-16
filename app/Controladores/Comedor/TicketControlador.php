@@ -400,7 +400,7 @@ class TicketControlador extends Controlador{
         'tic_fecha' => $menu->fecha,
 				])->tic_id;
       $todos = Ticket::where('tic_id',$id)->first();
-      $parteA = str_pad($token['user_id'], 6, "0", STR_PAD_LEFT);
+      $parteA = str_pad($us->id, 6, "0", STR_PAD_LEFT);
       $parteB = str_pad(date('dmY'), 6, "0", STR_PAD_LEFT);
       $parteC = str_pad($id, 6, "0", STR_PAD_LEFT);
       $todos->update([
@@ -415,6 +415,7 @@ class TicketControlador extends Controlador{
       );
 		} catch (\Illuminate\Database\QueryException $e) {
       $errorCode = $e->errorInfo[0];
+      $error = false;
       if($errorCode == "D000M"){
         $error = "Usted ya tiene un ticket comprado";
       }
@@ -427,7 +428,7 @@ class TicketControlador extends Controlador{
       if($errorCode == "D003M"){
         $error = "No puede comprar mas tickets";
       }
-      if($errorCode == "D003M"){
+      if($errorCode == "D004M"){
         $error = "Terminado consulta de forma imprevista";
       }
       return $response->withStatus(403)->withJson(
