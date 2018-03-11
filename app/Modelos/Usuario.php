@@ -109,7 +109,6 @@ class Usuario extends Model{
 		'usu_nombre',
 		'usu_apellido',
     'usu_contraseña',
-		'usu_token',
     'modificado',
     'creado',
     'estado',
@@ -125,7 +124,6 @@ class Usuario extends Model{
 		'usu_nombre',
 		'usu_apellido',
     'usu_contraseña',
-		'usu_token',
     'usu_image',
     'estado'
 	];

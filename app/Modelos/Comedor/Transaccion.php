@@ -31,7 +31,6 @@ class Transaccion extends Model{
   protected $maps = [
     'id' => 'tra_id',
 		'concepto' => 'tra_concepto',
-		'token' => 'tra_token',
 		'monto' => 'tra_monto',
     'estado_transaccion' => 'tra_estado',
     'fecha_acreditacion' => 'tra_fecha',
@@ -50,7 +49,7 @@ class Transaccion extends Model{
     'tra_id',
     'usu_id',
 		'tra_concepto',
-		'tra_token',
+		'pay_id',
     'tra_monto',
 		'tra_estado',
     'tra_fecha',
@@ -61,7 +60,7 @@ class Transaccion extends Model{
 	protected $fillable = [
 		'usu_id',
 		'tra_concepto',
-		'tra_token',
+		'pay_id',
     'tra_monto',
     'tra_fecha',
     'tra_estado',
